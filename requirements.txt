@@ -1,0 +1,10 @@
+# Run pip install --requirement=requirements.txt to install al requirements
+
+click==6.7
+py==1.4.34
+pytest==3.2.3
+pymzml
+ursgal
+theano
+pymc3
+
