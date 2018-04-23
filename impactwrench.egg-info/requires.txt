@@ -1,0 +1,10 @@
+pymzml
+scipy
+numpy
+matplotlib
+ursgal
+pymc3
+theano
+seaborn
+sklearn
+mlxtend

@@ -1,0 +1,9 @@
+MANIFEST.in
+README.md
+setup.py
+impactwrench.egg-info/PKG-INFO
+impactwrench.egg-info/SOURCES.txt
+impactwrench.egg-info/dependency_links.txt
+impactwrench.egg-info/not-zip-safe
+impactwrench.egg-info/requires.txt
+impactwrench.egg-info/top_level.txt
