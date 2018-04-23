@@ -42,4 +42,7 @@ To run the tests:
     $ pytest
 ```
 
-The access script can be easily modified to allow one to access a few functions at a time.
+To run the script:
+```
+$ python impactwrench.py
+```
