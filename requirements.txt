@@ -12,5 +12,7 @@ sklearn
 mlxtend
 matplotlib
 seaborn
+numpy
+pandas
 
 
