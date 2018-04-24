@@ -72,7 +72,7 @@ def perceptron(x,y):
 
     import os
     with tf.Session(graph=g) as sess:
-    saver.restore(sess, "./my_perceptron.ckpt" )
+        saver.restore(sess, "./my_perceptron.ckpt" )
 
     for epoch in range(1):
         for example, target in zip(x, y):

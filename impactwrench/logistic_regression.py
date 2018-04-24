@@ -21,7 +21,7 @@ from scipy import integrate
 import theano as thno
 import theano.tensor as T
 
-def run_models(data, upper_order=5):
+def run_models(combined_psm, upper_order=5):
  
 
     models, traces = OrderedDict(), OrderedDict()
@@ -34,7 +34,7 @@ def run_models(data, upper_order=5):
         with pm.Model() as models[nm]:
 
             print('\nRunning: {}'.format(nm))
-            pm.glm.GLM.from_formula(fml, df, family=pm.glm.families.Normal())
+            pm.glm.GLM.from_formula(fml, combined_psm, family=pm.glm.families.Normal())
 
             traces[nm] = pm.sample(2000, chains=1, init=None, tune=1000)
 
@@ -53,9 +53,10 @@ def plot_traces(traces, retain=1000):
 def create_poly_modelspec(k=1):
     return ('Identity ~ OMSSA:evalue + Exp m/z OMSSA:pvalue')
 
-with pm.Model() as logistic_model:
-    pm.glm.GLM.from_formula('Identity ~ OMSSA:evalue + Exp m/z + OMSSA:pvalue', combined_psm, family=pm.glm.families.Binomial())
-    trace_logistic_model = pm.sample(2000, chains=1, tune=1000)
+def define_model(combined_psm):
+    with pm.Model() as logistic_model:
+        pm.glm.GLM.from_formula('Identity ~ OMSSA:evalue + Exp m/z + OMSSA:pvalue', combined_psm, family=pm.glm.families.Binomial())
+        trace_logistic_model = pm.sample(2000, chains=1, tune=1000)
 
 def plot_distribution_of_factors(x):
 	trace = x
