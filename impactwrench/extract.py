@@ -8,7 +8,7 @@ import pymzml
 from os import listdir
 import click
 import ursgal
-from socketwrench import *
+
 
 def remove_nan(x):
 	return x.dropna(how = 'any')
