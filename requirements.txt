@@ -7,4 +7,10 @@ pymzml
 ursgal
 theano
 pymc3
+dtw
+sklearn
+mlxtend
+matplotlib
+seaborn
+
 
