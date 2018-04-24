@@ -2,7 +2,7 @@ import numpy as np
 from scipy.sparse import csc_matrix, eye, diags
 from scipy.sparse.linalg import spsolve
 
-def main():
+
 #whittaker smoothing function
 
     def WhittakerSmooth(x,w,lambda_,differences=1):
@@ -80,16 +80,21 @@ def main():
             return run['TIC'].peaks
 
         from dtw import dtw
-        retention_time_1 = []
-        retention_time_2 = []
 
-        dist, cost, acc, path = dtw(x, y, dist = lambda, x, y: norm(x-y, ord = 1))
         # custom distance distances
 
         def distance(x, y):
-            return (x *x) +(y*y)
-        dist, cost, acc, path = dtw(x, y, dist = my_custom_norm)
+            my_custom_norm =  (x *x) +(y*y)
+            dist, cost, acc, path = dtw(x, y, dist = my_custom_norm)
+            imshow(acc.T, origin='lower', cmap=cm.gray, interpolation='nearest')
+            plot(path[0], path[1], 'w')
+            xlim((-0.5, acc.shape[0]-0.5))
+            ylim((-0.5, acc.shape[1]-0.5))
 
-if __name__ == '__main__':
-        main()   
-        
+
+        def dtw_2(x, y):
+            dist,cost, acc, path = dtw(x, y, dist = lambda x, y: norm(x-y, ord = 1))
+            imshow(acc.T, origin='lower', cmap=cm.gray, interpolation='nearest')
+            plot(path[0], path[1], 'w')
+            xlim((-0.5, acc.shape[0]-0.5))
+            ylim((-0.5, acc.shape[1]-0.5))

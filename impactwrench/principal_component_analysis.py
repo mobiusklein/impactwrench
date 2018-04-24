@@ -13,66 +13,50 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import KernelPCA
 
+def local_linear_embedding(x):
+    lle = LocallyLinearEmbedding(n_components = 0.95, n_neighbours = 10)
+    return lle.fit_transform(x)
+
 
         
-def calculate_mean_vector(df):
-    
-     _extract_pvalues = df.iloc[:, ['OMSSA:pvalue']]
-     _mean_vector = _extract_pvalues.mean()
-return  corrected_values(min_periods = 3)
+def calculate_mean_vector(x):
+	
+	 _extract_pvalues = x.iloc[:, ['OMSSA:pvalue']]
+	 _mean_vector = _extract_pvalues.mean()
+	 return  _mean_vector
 
 
-        # acquisition of eigenvalues
-corrected_values_array = corrected_values.as_matrix(columns = None)
-eigen_values = LA.eigvals(corrected_values_array)
-eigen_vectors = LA.eigh(corrected_values_array)
 
-def singular_value_decomposition(df):
-    df_centered = X_train -X_train.mean(axis = 0)
-    U, s, V = np.linalg.svd(df_centered)
+def acquire_eigen_values(x):
+	corrected_values_array = _x.as_matrix(columns = None)
+	eigen_values = LA.eigvals(corrected_values_array)
+	return LA.eigh(corrected_values_array)
+
+def singular_value_decomposition(x):
+    U, s, V = np.linalg.svd(x- x.mean(axis = 0))
     c1 = V.T[:, 0]
     c2 = V.T[:,1]
     return c1, c2
 
-#projecting set onto two dimensions
-    W2 = V.T[:, :2]
-    X2D= X_centered.dot(W2)
-    pca = PCA(n_components = 2)
-    X2D = pca.fit_transform(X_train)
+def minimal_number_components(x):
+    pca = PCA(n_components= 0.95)
+    return pca.fit_transform(x)
+    
 
 #increamental PCA
-
-n_batches= 100
-inc_pca = IncrementalPCA(n_components = 2)
-for X_batch in np.array_split(X_train, n_batches):
-    inc_pca.partial_fit(X_batch)
-
-    X_reduced = inc_pca.transform(X_train)
-
-
-    clf= Pipeline([
-        ("kpca", KernelPCA(n_components = 2)),
-        ("log_reg", LogisticRegression())
-    ])
-
-    param_grid = [{
-                "kpca__gamma":np.linspace(0.03, 0.05, 10),
-                "kpca__kernel":["rbf", "sigmoid"]
-    }]
-
-    grid_search = GridSearchCV(clf,param_grid, cv = 3)
-    grid_search.fit(X_train,Y_train)
-    print(grid_search.best_params_)
+def incremental_pca(x,y):
+    n_batches= 100
+    inc_pca = IncrementalPCA(n_components = 2)
+    for X_batch in np.array_split(x , n_batches):
+        inc_pca.partial_fit(X_batch)
+    return  inc_pca.transform(x)
 
 
-        #kernel PCA
+def randomized_pca(x):
+    rnd_pca = PCA(n_components=0.95,svd_solver= "randomized")
+    return rnd_pca.fit_transform(x)
         
 
-component_limit = 4
-def kernel_pca(x):
-    for n_components < 4:
-        rbf_pca = KernelPCA(n_components, kernel = "rbf", gamma = 0.04)
-        return rbf_pca.fit_transform(train_set)
 
 # selecting best parameters
 from sklearn.model_selection import GridSearchCV
@@ -88,14 +72,9 @@ def best_parameters(train_set):
     grid_search.fit(train_set)
     return grid_search.best_params_
 
-#cumulative pca
-pca = PCA().fit(X_train)
-
-       #plot pca results
-
-       #plot pca results
 def plot_pca(x):
     pca = KernelPCA(kernel="rbf", fit_inverse_transform=True, gamma=10)
+    kpca = KernelPCA()
     X_kpca = kpca.fit_transform(x)
     X_back = kpca.inverse_transform(x_kpca)
     pca = PCA()
