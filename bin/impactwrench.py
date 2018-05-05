@@ -14,16 +14,23 @@ from principal_component_analysis import *
 from signal_processing import *
 from perceptron import *
 from logistic_regression import *
-from gooey import Gooey
+from gooey import Gooey, GooeyParser
+from gooey import *
+import argparse
 from folder_wide_processing import *
 
-@Gooey 
+@Gooey(program_name = 'impactwrench', advanced = True)
 def main():
-	parser = ArgumentParser()
+	parser = GooeyParser(description='LC-MS/MS Signal Processing')
 
-	directory = click.prompt('Please enter a valid file path with two mzML files', type=str)
+	parser.add_argument(
+	'Filepath',
+	metavar='Filepath',
+	help='Enter a valid file path!')
+	args = parser.parse_args()
+
 	dicts ={}
-	directory = "C:\\Users\\Kundai\\test_files"
+	directory = args.Filepath
 	keys = ["file_1", "file_2"]
 	files_dir =  listdir(directory)
 	filenames = []
@@ -77,7 +84,7 @@ def main():
 	y = df.loc[:, ['Identity']].values
 	y = np.ravel(y)
 
-    
+	
 
 	X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=500,random_state=4)
 
@@ -136,21 +143,33 @@ def main():
 
   #with pm.Model() as logistic_model:
    # pm.glm.GLM.from_formula('Identity ~ OMSSA:evalue + Exp m/z + OMSSA:pvalue', combined_psm, family=pm.glm.families.Binomial())
-    #trace_logistic_model = pm.sample(2000, chains=1, tune=1000)
+	#trace_logistic_model = pm.sample(2000, chains=1, tune=1000)
 
   #plot_traces(trace_logistic_model)
   #plot_distribution_of_factors(trace_logistic_model)
 
 # Folder wide processing
+	parser.add_argument(
+	'Fasta',
+	metavar='Fasta',
+	help='Enter a valid file path to a fasta file!')
+	args = parser.parse_args()
+	decoy = generate_decoy(args.Fasta)
 
-    fasta_file_path = click.prompt('Please enter a valid file path to a fasta file', type=str)
-    decoy = generate_decoy(fasta_file_path)
+	parser = GooeyParser(description='LC-MS/MS Signal Processing')
+	parser.add_argument('Folder',metavar='Fasta',help='Enter a valid file path to a fasta file!')
+	args = parser.parse_args()
+	folder = args.Folder
 
-	folder  = click.prompt('Please enter a valid file path to a folder with mzML files', type=str)
+	parser = GooeyParser(description='LC-MS/MS Signal Processing')
+	parser.add_argument('decoy',metavar='Fasta',help='Enter a valid file path to the decoy database')
+	args = parser.parse_args()
+	decoy_database = args.decoy
 
-	decoy_database = click.prompt('Please enter a valid file path to the decoy database', type=str)
-
-	result_folder = click.prompt('Please enter a valid file path to where the PSM csv files', type=str)
+	parser = GooeyParser(description='LC-MS/MS Signal Processing')
+	parser.add_argument('result_folder',metavar='Fasta',help='Enter a valid file path to the folder with PSM csvs')
+	args = parser.parse_args()
+	result_folder= args.result_folder
 
 	combined_result_files = combine_results(result_folder)
 
@@ -159,14 +178,14 @@ def main():
 
 	combined_result_files['FDR'] = calc_FDR(psm_count, is_decoy)
 
-    combined_result_files['Category'] = np.sign(combined_result_files['FDR']-0.25)
+	combined_result_files['Category'] = np.sign(combined_result_files['FDR']-0.25)
 
-    #using an RBF SVM to validate the protein probability scores
-    X = feature_space.loc[:,['OMSSA:evalue', 'OMSSA:pvalue', 'PSM_counts', 'mass']].values
+	#using an RBF SVM to validate the protein probability scores
+	X = feature_space.loc[:,['OMSSA:evalue', 'OMSSA:pvalue', 'PSM_counts', 'mass']].values
 	y = feature_space.loc[:,['Category']].values
 	y = y.astype(np.int64)
 	y = np.ravel(y)
-    combined_result_files['SVM Score'] = validate_results(X,y)
+	combined_result_files['SVM Score'] = validate_results(X,y)
 
 
 
