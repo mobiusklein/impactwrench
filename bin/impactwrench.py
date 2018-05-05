@@ -14,9 +14,12 @@ from principal_component_analysis import *
 from signal_processing import *
 from perceptron import *
 from logistic_regression import *
+from gooey import Gooey
+from folder_wide_processing import *
 
-
+@Gooey 
 def main():
+	parser = ArgumentParser()
 
 	directory = click.prompt('Please enter a valid file path with two mzML files', type=str)
 	dicts ={}
@@ -138,7 +141,47 @@ def main():
   #plot_traces(trace_logistic_model)
   #plot_distribution_of_factors(trace_logistic_model)
 
+# Folder wide processing
 
+    fasta_file_path = click.prompt('Please enter a valid file path to a fasta file', type=str)
+    decoy = generate_decoy(fasta_file_path)
+
+	folder  = click.prompt('Please enter a valid file path to a folder with mzML files', type=str)
+
+	decoy_database = click.prompt('Please enter a valid file path to the decoy database', type=str)
+
+	result_folder = click.prompt('Please enter a valid file path to where the PSM csv files', type=str)
+
+	combined_result_files = combine_results(result_folder)
+
+	is_decoy = combined_result_files.loc[:, 'Is decoy']
+	psm_count= combined_result_files.loc[:, 'PSM_counts']
+
+	combined_result_files['FDR'] = calc_FDR(psm_count, is_decoy)
+
+    combined_result_files['Category'] = np.sign(combined_result_files['FDR']-0.25)
+
+    #using an RBF SVM to validate the protein probability scores
+    X = feature_space.loc[:,['OMSSA:evalue', 'OMSSA:pvalue', 'PSM_counts', 'mass']].values
+	y = feature_space.loc[:,['Category']].values
+	y = y.astype(np.int64)
+	y = np.ravel(y)
+    combined_result_files['SVM Score'] = validate_results(X,y)
+
+
+
+   # folder wide clustering, heatmaps and dendograms
+   cluster_dendogram(Z,truncate_mode='lastp',p=12,leaf_rotation=90.,leaf_font_size=12.,show_contracted=True,annotate_above=10,  )
+   plt.show()
+
+   cluster_plots(X)
+   cnf_matrix = confusion_matrix(y_test, y_pred)
+   np.set_printoptions(precision=2)
+
+   plot_confusion_matrix(cnf_matrix, classes=class_names,title='Confusion matrix, without normalization')
+   plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,title='Normalized confusion matrix')
+   silhouette_analysis(X)
+   affinity_propagation_clustering(X, 1)  # the integer value represents the desired number of centers
 
 
 if __name__ == '__main__':
